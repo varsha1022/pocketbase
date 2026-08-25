@@ -50,28 +50,30 @@ func html2Text(htmlDocument string) (string, error) {
 			activeBuilder = &builder
 		}
 
-		switch n.Type {
-		case html.TextNode:
-			txt := whitespaceRegex.ReplaceAllString(n.Data, " ")
+        switch n.Type {
+        case html.TextNode:
+		txt := whitespaceRegex.ReplaceAllString(n.Data, " ")
 
-			// the prev node has new line so it is safe to trim the indentation
-			if !canAddNewLine {
-				txt = strings.TrimLeft(txt, " ")
-			}
+		// the prev node has new line so it is safe to trim the indentation
+		if !canAddNewLine {
+			txt = strings.TrimLeft(txt, " ")
+		}
 
-			if txt != "" {
-				activeBuilder.WriteString(txt)
-				canAddNewLine = true
-			}
-		case html.ElementNode:
-			if n.Data == "br" {
-				// always write new lines when <br> tag is used
-				activeBuilder.WriteString("\r\n")
-				canAddNewLine = false
-			} else if canAddNewLine && !list.ExistInSlice(n.Data, inlineTags) {
-				activeBuilder.WriteString("\r\n")
-				canAddNewLine = false
-			}
+		if txt != "" {
+			activeBuilder.WriteString(txt)
+			canAddNewLine = true
+		}
+        case html.ElementNode:
+		if n.Data == "br" {
+			// always write new lines when <br> tag is used
+			activeBuilder.WriteString("\r\n")
+			canAddNewLine = false
+		} else if canAddNewLine && !list.ExistInSlice(n.Data, inlineTags) {
+			activeBuilder.WriteString("\r\n")
+			canAddNewLine = false
+		}
+        default:
+        }
 
 			// prefix list items with dash
 			if n.Data == "li" {
