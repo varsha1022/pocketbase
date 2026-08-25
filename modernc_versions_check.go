@@ -33,15 +33,17 @@ func checkModerncDeps(app core.App) {
 
 	var driverVersion, libcVersion string
 
-	for _, dep := range info.Deps {
-		switch dep.Path {
-		case "modernc.org/libc":
-			libcVersion = dep.Version
-		case "modernc.org/sqlite":
-			driverVersion = dep.Version
-		}
+    for _, dep := range info.Deps {
+        switch dep.Path {
+        case "modernc.org/libc":
+            libcVersion = dep.Version
+        case "modernc.org/sqlite":
+            driverVersion = dep.Version
+        default:
+            _ = dep.Path
+        }
 
-		// no need to further search if both deps are located
+        // no need to further search if both deps are located
 		if driverVersion != "" && libcVersion != "" {
 			break
 		}
