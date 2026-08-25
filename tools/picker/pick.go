@@ -42,12 +42,14 @@ func Pick(data any, rawFields string) (any, error) {
 	}
 	// ---
 
-	// special cases to preserve the same fields format when used with single item or search results data.
-	var isSearchResult bool
-	switch data.(type) {
-	case search.Result, *search.Result:
-		isSearchResult = true
-	}
+    // special cases to preserve the same fields format when used with single item or search results data.
+    var isSearchResult bool
+    switch data.(type) {
+    case search.Result, *search.Result:
+        isSearchResult = true
+    default:
+        isSearchResult = false
+    }
 
 	if isSearchResult {
 		if decodedMap, ok := decoded.(map[string]any); ok {
@@ -88,30 +90,32 @@ func parseFields(rawFields string) (map[string]Modifier, error) {
 }
 
 func pickParsedFields(data any, fields map[string]Modifier) error {
-	switch v := data.(type) {
-	case map[string]any:
-		pickMapFields(v, fields)
-	case []map[string]any:
-		for _, item := range v {
-			if err := pickMapFields(item, fields); err != nil {
-				return err
-			}
-		}
-	case []any:
-		if len(v) == 0 {
-			return nil // nothing to pick
-		}
+    switch v := data.(type) {
+    case map[string]any:
+        pickMapFields(v, fields)
+    case []map[string]any:
+        for _, item := range v {
+            if err := pickMapFields(item, fields); err != nil {
+                return err
+            }
+        }
+    case []any:
+        if len(v) == 0 {
+            return nil // nothing to pick
+        }
 
-		if _, ok := v[0].(map[string]any); !ok {
-			return nil // for now ignore non-map values
-		}
+        if _, ok := v[0].(map[string]any); !ok {
+            return nil // for now ignore non-map values
+        }
 
-		for _, item := range v {
-			if err := pickMapFields(item.(map[string]any), fields); err != nil {
-				return nil
-			}
-		}
-	}
+        for _, item := range v {
+            if err := pickMapFields(item.(map[string]any), fields); err != nil {
+                return nil
+            }
+        }
+    default:
+        return nil
+    }
 
 	return nil
 }
