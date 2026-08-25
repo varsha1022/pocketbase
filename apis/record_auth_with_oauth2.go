@@ -122,22 +122,24 @@ func recordAuthWithOAuth2(e *core.RequestEvent) error {
 		return e.InternalServerError("Failed OAuth2 relation check.", err)
 	}
 
-	switch {
-	case err == nil && externalAuthRel != nil:
-		authRecord, err = e.App.FindRecordById(form.collection, externalAuthRel.RecordRef())
-		if err != nil {
-			return err
-		}
-	case fallbackAuthRecord != nil && fallbackAuthRecord.Collection().Id == form.collection.Id:
-		// fallback to the logged auth record (if any)
-		authRecord = fallbackAuthRecord
-	case authUser.Email != "":
-		// look for an existing auth record by the external auth record's email
-		authRecord, err = e.App.FindAuthRecordByEmail(form.collection.Id, authUser.Email)
-		if err != nil && !errors.Is(err, sql.ErrNoRows) {
-			return e.InternalServerError("Failed OAuth2 auth record check.", err)
-		}
-	}
+    switch {
+    case err == nil && externalAuthRel != nil:
+        authRecord, err = e.App.FindRecordById(form.collection, externalAuthRel.RecordRef())
+        if err != nil {
+            return err
+        }
+    case fallbackAuthRecord != nil && fallbackAuthRecord.Collection().Id == form.collection.Id:
+        // fallback to the logged auth record (if any)
+        authRecord = fallbackAuthRecord
+    case authUser.Email != "":
+        // look for an existing auth record by the external auth record's email
+        authRecord, err = e.App.FindAuthRecordByEmail(form.collection.Id, authUser.Email)
+        if err != nil && !errors.Is(err, sql.ErrNoRows) {
+            return e.InternalServerError("Failed OAuth2 auth record check.", err)
+        }
+    default:
+        authRecord = nil
+    }
 
 	// ---------------------------------------------------------------
 
