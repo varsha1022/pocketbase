@@ -1,6 +1,7 @@
 export function appHeader() {
     return () => {
-        if (!app.store._ready || !app.store.showHeader || !app.store.superuser?.id) {
+        const app = (typeof window !== "undefined" && window.app) ? window.app : undefined;
+        if (!app?.store?._ready || !app?.store?.showHeader || !app?.store?.superuser?.id) {
             return;
         }
 
