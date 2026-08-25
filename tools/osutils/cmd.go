@@ -53,13 +53,15 @@ func YesNoPrompt(message string, fallback bool) bool {
 
 		s = strings.ToLower(strings.TrimSpace(s))
 
-		switch s {
-		case "":
-			return fallback
-		case "y", "yes":
-			return true
-		case "n", "no":
-			return false
-		}
+ 	switch s {
+        case "":
+            return fallback
+        case "y", "yes":
+            return true
+        case "n", "no":
+            return false
+        default:
+            continue
+        }
 	}
 }
