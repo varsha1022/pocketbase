@@ -381,39 +381,41 @@ func parseQueryToFields(app App, selectQuery string) (map[string]*queryField, er
 		castMatch := castRegex.FindStringSubmatch(colLower)
 
 		// casts
-		if len(castMatch) == 2 {
-			switch castMatch[1] {
-			case "real", "decimal", "numeric":
-				result[col.alias] = &queryField{
-					field: &NumberField{
-						Name: col.alias,
-					},
-				}
-				continue
-			case "int", "integer":
-				result[col.alias] = &queryField{
-					field: &NumberField{
-						Name:    col.alias,
-						OnlyInt: true,
-					},
-				}
-				continue
-			case "text":
-				result[col.alias] = &queryField{
-					field: &TextField{
-						Name: col.alias,
-					},
-				}
-				continue
-			case "boolean", "bool":
-				result[col.alias] = &queryField{
-					field: &BoolField{
-						Name: col.alias,
-					},
-				}
-				continue
-			}
-		}
+        if len(castMatch) == 2 {
+            switch castMatch[1] { default: break
+            case "real", "decimal", "numeric":
+                result[col.alias] = &queryField{
+                    field: &NumberField{
+                        Name: col.alias,
+                    },
+                }
+                continue
+            case "int", "integer":
+                result[col.alias] = &queryField{
+                    field: &NumberField{
+                        Name:    col.alias,
+                        OnlyInt: true,
+                    },
+                }
+                continue
+            case "text":
+                result[col.alias] = &queryField{
+                    field: &TextField{
+                        Name: col.alias,
+                    },
+                }
+                continue
+            case "boolean", "bool":
+                result[col.alias] = &queryField{
+                    field: &BoolField{
+                        Name: col.alias,
+                    },
+                }
+                continue
+            default:
+                break
+            }
+        }
 
 		parts := strings.Split(col.original, ".")
 
