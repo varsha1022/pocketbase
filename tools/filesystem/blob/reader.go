@@ -98,14 +98,16 @@ func (r *Reader) Seek(offset int64, whence int) (int64, error) {
 	if r.baseLength >= 0 && r.baseLength < maxRelativeOffset {
 		maxRelativeOffset = r.baseLength
 	}
-	switch whence {
-	case io.SeekStart:
-		r.relativeOffset = offset
-	case io.SeekCurrent:
-		r.relativeOffset += offset
-	case io.SeekEnd:
-		r.relativeOffset = maxRelativeOffset + offset
-	}
+		switch whence { default:
+		case io.SeekStart:
+			r.relativeOffset = offset
+		case io.SeekCurrent:
+			r.relativeOffset += offset
+		case io.SeekEnd:
+			r.relativeOffset = maxRelativeOffset + offset
+		default:
+			return 0, fmt.Errorf("invalid whence %d", whence)
+		}
 	if r.relativeOffset < 0 {
 		// "Seeking to an offset before the start of the file is an error."
 		invalidOffset := r.relativeOffset
