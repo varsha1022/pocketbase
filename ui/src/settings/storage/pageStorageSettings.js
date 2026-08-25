@@ -1,6 +1,10 @@
 import { settingsSidebar } from "../settingsSidebar";
 
 export function pageStorageSettings() {
+    var app = (typeof window !== "undefined")
+        ? (window.app = window.app || { store: {} })
+        : (typeof globalThis !== "undefined" ? (globalThis.app = globalThis.app || { store: {} }) : { store: {} });
+    app.store = app.store || {};
     app.store.title = "File storage";
 
     const data = store({
