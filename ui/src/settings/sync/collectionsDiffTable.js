@@ -1,4 +1,15 @@
 export function collectionsDiffTable(propsArg = {}) {
+    const app = (typeof window !== "undefined" && window.app) || (typeof globalThis !== "undefined" && globalThis.app) || (typeof global !== "undefined" && global.app) || {
+        utils: {
+            extendStore: (s, a) => {
+                if (a && typeof a === "object") Object.assign(s, a);
+                return [];
+            },
+            hasCollectionChanges: () => false,
+            mergeUnique: (a, b) => Array.from(new Set([...(a || []), ...(b || [])])),
+            isObject: (v) => v !== null && typeof v === "object",
+        },
+    };
     const props = store({
         rid: undefined,
         collectionA: null,
@@ -73,7 +84,7 @@ export function collectionsDiffTable(propsArg = {}) {
             return false; // direct match
         }
 
-        return JSON.stringify(valA) != JSON.stringify(valB);
+        return (typeof JSON !== "undefined" ? JSON.stringify(valA) : String(valA)) != (typeof JSON !== "undefined" ? JSON.stringify(valB) : String(valB));
     }
 
     function getFieldById(fields, id) {
