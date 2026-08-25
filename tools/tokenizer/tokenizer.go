@@ -142,12 +142,14 @@ func (t *Tokenizer) readToken() (string, error) {
 			} else if !t.ignoreParenthesis && ch == ')' && parenthesis > 0 && quoteCh == eof {
 				parenthesis-- // closing parenthesis
 			} else if t.isQuoteRune(ch) {
-				switch quoteCh {
-				case ch:
-					quoteCh = eof // closing quote
-				case eof:
-					quoteCh = ch // opening quote
-				}
+            switch quoteCh {
+            case ch:
+                quoteCh = eof // closing quote
+            case eof:
+                quoteCh = ch // opening quote
+            default:
+                _ = quoteCh
+            }
 			}
 		}
 
