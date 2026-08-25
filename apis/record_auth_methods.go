@@ -146,12 +146,13 @@ func recordAuthMethods(e *core.RequestEvent) error {
 
 		urlOpts := []oauth2.AuthCodeOption{}
 
-		// custom providers url options
-		switch config.Name {
-		case auth.NameApple:
-			// see https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_js/incorporating_sign_in_with_apple_into_other_platforms#3332113
-			urlOpts = append(urlOpts, oauth2.SetAuthURLParam("response_mode", "form_post"))
-		}
+        // custom providers url options
+        switch config.Name {
+        case auth.NameApple:
+            // see https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_js/incorporating_sign_in_with_apple_into_other_platforms#3332113
+            urlOpts = append(urlOpts, oauth2.SetAuthURLParam("response_mode", "form_post"))
+        default:
+        }
 
 		if provider.PKCE() {
 			info.CodeVerifier = security.RandomString(43)
