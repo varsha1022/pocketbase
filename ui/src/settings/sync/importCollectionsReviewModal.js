@@ -14,8 +14,10 @@ window.app.modals.openImportCollectionsReview = function(oldCollections, newColl
 
     document.body.appendChild(modal);
 
-    app.modals.open(modal);
+    window.app.modals.open(modal);
 };
+
+const app = window.app || (window.app = {});
 
 function importCollectionsModal(oldCollections, newCollections, settingsArg) {
     let modal;
@@ -86,7 +88,7 @@ function importCollectionsModal(oldCollections, newCollections, settingsArg) {
         }
 
         if (deletedFieldNames.length) {
-            app.modals.confirm(
+            window.app.modals.confirm(
                 [
                     t.h6(
                         null,
