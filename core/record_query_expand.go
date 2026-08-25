@@ -219,16 +219,18 @@ func (app *BaseApp) expandRecords(records []*Record, expandPath string, fetchFun
 
 		expandData := model.Expand()
 
-		// normalize access to the previously expanded rel records (if any)
-		var oldExpandedRels []*Record
-		switch v := expandData[relField.Name].(type) {
-		case nil:
-			// no old expands
-		case *Record:
-			oldExpandedRels = []*Record{v}
-		case []*Record:
-			oldExpandedRels = v
-		}
+	// normalize access to the previously expanded rel records (if any)
+	var oldExpandedRels []*Record
+	switch v := expandData[relField.Name].(type) {
+	case nil:
+		// no old expands
+	case *Record:
+		oldExpandedRels = []*Record{v}
+	case []*Record:
+		oldExpandedRels = v
+	default:
+		oldExpandedRels = nil
+	}
 
 		// merge expands
 		for _, oldExpandedRel := range oldExpandedRels {
