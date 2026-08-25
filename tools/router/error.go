@@ -188,17 +188,17 @@ func resolveSafeErrorsData[T any](data map[string]T) map[string]any {
 }
 
 func isNestedError(err any) bool {
-	switch err.(type) {
-	case validation.Errors,
-		map[string]validation.Error,
-		map[string]SafeErrorItem,
-		map[string]error,
-		map[string]string,
-		map[string]any:
-		return true
-	}
-
-	return false
+	switch err := err.(type) {
+case validation.Errors,
+    map[string]validation.Error,
+    map[string]SafeErrorItem,
+    map[string]error,
+    map[string]string,
+    map[string]any:
+    return true
+default:
+    return false
+}
 }
 
 // resolveSafeErrorItem extracts from each validation error its
