@@ -572,21 +572,17 @@ func arrVal[T any](m []T, keys ...string) (any, error) {
 }
 
 func splitModifier(combined string) (string, string, error) {
-	parts := strings.Split(combined, ":")
+    parts := strings.Split(combined, ":")
 
-	if len(parts) != 2 {
-		return combined, "", nil
-	}
+    if len(parts) != 2 {
+        return combined, "", nil
+    }
 
-	// validate modifier
-	switch parts[1] {
-	case issetModifier,
-		eachModifier,
-		lengthModifier,
-		lowerModifier,
-		changedModifier:
-		return parts[0], parts[1], nil
-	}
-
-	return "", "", fmt.Errorf("unknown modifier in %q", combined)
+    // validate modifier
+    switch parts[1] {
+    case issetModifier, eachModifier, lengthModifier, lowerModifier, changedModifier:
+        return parts[0], parts[1], nil
+    default:
+        return "", "", fmt.Errorf("unknown modifier in %q", combined)
+    }
 }
