@@ -31,6 +31,7 @@ window.app.modals.openRecordUpsert = function(collection, record = null, modalSe
     onpasswordresetsend: null, // function(record) {},
     onverificationsend: null, // function(record) {},
 }) {
+    const app = window.app;
     app.store.errors = null; // reset
 
     const modal = recordUpsertModal(collection, record, modalSettings);
@@ -53,6 +54,7 @@ function recordUpsertModal(collection, rawRecord, modalSettings) {
         return;
     }
 
+    const app = window.app;
     let modal;
 
     const uniqueId = "record_upsert_" + app.utils.randomString();
@@ -125,6 +127,8 @@ function recordUpsertModal(collection, rawRecord, modalSettings) {
             case "passwordConfirm":
             case "tokenKey":
                 return data.isAuthCollection ? undefined : val;
+            default:
+                break;
         }
 
         return val;
@@ -650,7 +654,7 @@ function recordUpsertModal(collection, rawRecord, modalSettings) {
         {
             pbEvent: "recordUpsertModal",
             className: "modal record-upsert-modal",
-            onbeforeopen: () => {
+            onbeforeopen: (el) => {
                 initRecord(rawRecord);
 
                 return modalSettings.onbeforeopen?.(el);
