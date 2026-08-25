@@ -1,6 +1,15 @@
 import { settingsSidebar } from "../settingsSidebar";
 
 export function pageImportCollections(route) {
+    const app = (typeof globalThis !== "undefined" && globalThis.app) || (typeof window !== "undefined" && window.app) || {};
+    app.store = app.store ?? {};
+    app.utils = app.utils ?? {};
+    app.pb = app.pb ?? { collections: { getFullList: async () => [] } };
+    app.components = app.components ?? {};
+    app.checkApiError = app.checkApiError ?? (() => {});
+    app.toasts = app.toasts ?? { error: () => {}, success: () => {} };
+    app.utils.randomString = app.utils.randomString ?? (() => Math.random().toString(36).slice(2));
+
     app.store.title = "Import collections";
 
     const uniqueId = "import_" + app.utils.randomString();
@@ -222,10 +231,27 @@ export function pageImportCollections(route) {
 
             // update index names that contains the collection id
             for (let i = 0; i < collection.indexes?.length; i++) {
-                collection.indexes[i] = collection.indexes[i].replace(
-                    /create\s+(?:unique\s+)?\s*index\s*(?:if\s+not\s+exists\s+)?(\S*)\s+on/gim,
-                    (v) => v.replace(originalId, replacedId),
-                );
+                const idx = collection.indexes[i];
+                const lower = typeof idx === "string" ? idx.toLowerCase() : "";
+                const createPos = lower.indexOf("create ");
+                if (createPos === -1) {
+                    collection.indexes[i] = typeof idx === "string" ? idx.replaceAll(originalId, replacedId) : idx;
+                    continue;
+                }
+                const indexPos = lower.indexOf(" index", createPos);
+                if (indexPos === -1) {
+                    collection.indexes[i] = typeof idx === "string" ? idx.replaceAll(originalId, replacedId) : idx;
+                    continue;
+                }
+                const onPos = lower.indexOf(" on ", indexPos);
+                if (onPos === -1) {
+                    collection.indexes[i] = typeof idx === "string" ? idx.replaceAll(originalId, replacedId) : idx;
+                    continue;
+                }
+                const nameStart = indexPos + " index".length;
+                const indexName = idx.slice(nameStart, onPos);
+                const safeIndexName = typeof indexName === "string" ? indexName.replaceAll(originalId, replacedId) : indexName;
+                collection.indexes[i] = idx.slice(0, nameStart) + safeIndexName + idx.slice(onPos);
             }
         }
 
