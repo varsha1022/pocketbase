@@ -226,17 +226,17 @@ func (f *PasswordField) ValidateSettings(ctx context.Context, app App, collectio
 func (f *PasswordField) getPasswordValue(record *Record) *PasswordFieldValue {
 	raw := record.GetRaw(f.Name)
 
-	switch v := raw.(type) {
-	case *PasswordFieldValue:
-		return v
-	case string:
-		// we assume that any raw string starting with $2 is bcrypt hash
-		if strings.HasPrefix(v, "$2") {
-			return &PasswordFieldValue{Hash: v}
-		}
-	}
-
-	return &PasswordFieldValue{}
+    switch v := raw.(type) {
+    case *PasswordFieldValue:
+        return v
+    case string:
+        // we assume that any raw string starting with $2 is bcrypt hash
+        if strings.HasPrefix(v, "$2") {
+            return &PasswordFieldValue{Hash: v}
+        }
+    default:
+        return &PasswordFieldValue{}
+    }
 }
 
 // Intercept implements the [RecordInterceptor] interface.
@@ -247,12 +247,14 @@ func (f *PasswordField) Intercept(
 	actionName string,
 	actionFunc func() error,
 ) error {
-	switch actionName {
-	case InterceptorActionAfterCreate, InterceptorActionAfterUpdate:
-		// unset the plain field value after successful create/update
-		fp := f.getPasswordValue(record)
-		fp.Plain = ""
-	}
+    switch actionName {
+    case InterceptorActionAfterCreate, InterceptorActionAfterUpdate:
+        // unset the plain field value after successful create/update
+        fp := f.getPasswordValue(record)
+        fp.Plain = ""
+    default:
+        break
+    }
 
 	return actionFunc()
 }
