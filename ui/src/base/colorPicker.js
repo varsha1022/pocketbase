@@ -17,6 +17,7 @@ window.app.components = window.app.components || {};
  * @return {Element}
  */
 window.app.components.colorPicker = function(propsArg = {}) {
+    const app = window.app || {};
     const uniqueId = "picker_" + app.utils.randomString();
 
     const props = store({
