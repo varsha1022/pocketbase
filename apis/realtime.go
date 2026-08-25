@@ -531,11 +531,13 @@ func bindRealtimeEvents(app core.App) {
 func realtimeResolveRecord(app core.App, model core.Model, optCollectionType string) *core.Record {
 	var record *core.Record
 	switch m := model.(type) {
-	case *core.Record:
-		record = m
-	case core.RecordProxy:
-		record = m.ProxyRecord()
-	}
+case *core.Record:
+	record = m
+case core.RecordProxy:
+	record = m.ProxyRecord()
+default:
+	record = nil
+}
 
 	if record != nil {
 		if optCollectionType == "" || record.Collection().Type == optCollectionType {
