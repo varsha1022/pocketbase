@@ -173,38 +173,38 @@ func buildResolversExpr(
 ) (dbx.Expression, error) {
 	var expr dbx.Expression
 
-	switch op {
-	case fexpr.SignEq, fexpr.SignAnyEq:
-		expr = resolveEqualExpr(true, left, right)
-	case fexpr.SignNeq, fexpr.SignAnyNeq:
-		expr = resolveEqualExpr(false, left, right)
-	case fexpr.SignLike, fexpr.SignAnyLike:
-		// the right side is a column and therefor wrap it with "%" for contains like behavior
-		if len(right.Params) == 0 {
-			expr = dbx.NewExp(fmt.Sprintf("%s LIKE ('%%' || %s || '%%') ESCAPE '\\'", left.Identifier, right.Identifier), left.Params)
-		} else {
-			expr = dbx.NewExp(fmt.Sprintf("%s LIKE %s ESCAPE '\\'", left.Identifier, right.Identifier), mergeParams(left.Params, wrapLikeParams(right.Params)))
-		}
-	case fexpr.SignNlike, fexpr.SignAnyNlike:
-		// the right side is a column and therefor wrap it with "%" for not-contains like behavior
-		if len(right.Params) == 0 {
-			expr = dbx.NewExp(fmt.Sprintf("%s NOT LIKE ('%%' || %s || '%%') ESCAPE '\\'", left.Identifier, right.Identifier), left.Params)
-		} else {
-			expr = dbx.NewExp(fmt.Sprintf("%s NOT LIKE %s ESCAPE '\\'", left.Identifier, right.Identifier), mergeParams(left.Params, wrapLikeParams(right.Params)))
-		}
-	case fexpr.SignLt, fexpr.SignAnyLt:
-		expr = dbx.NewExp(fmt.Sprintf("%s < %s", left.Identifier, right.Identifier), mergeParams(left.Params, right.Params))
-	case fexpr.SignLte, fexpr.SignAnyLte:
-		expr = dbx.NewExp(fmt.Sprintf("%s <= %s", left.Identifier, right.Identifier), mergeParams(left.Params, right.Params))
-	case fexpr.SignGt, fexpr.SignAnyGt:
-		expr = dbx.NewExp(fmt.Sprintf("%s > %s", left.Identifier, right.Identifier), mergeParams(left.Params, right.Params))
-	case fexpr.SignGte, fexpr.SignAnyGte:
-		expr = dbx.NewExp(fmt.Sprintf("%s >= %s", left.Identifier, right.Identifier), mergeParams(left.Params, right.Params))
-	}
+    switch op {
+    case fexpr.SignEq, fexpr.SignAnyEq:
+        expr = resolveEqualExpr(true, left, right)
+    case fexpr.SignNeq, fexpr.SignAnyNeq:
+        expr = resolveEqualExpr(false, left, right)
+    case fexpr.SignLike, fexpr.SignAnyLike:
+        // the right side is a column and therefor wrap it with "%" for contains like behavior
+        if len(right.Params) == 0 {
+            expr = dbx.NewExp(fmt.Sprintf("%s LIKE ('%%' || %s || '%%') ESCAPE '\\'", left.Identifier, right.Identifier), left.Params)
+        } else {
+            expr = dbx.NewExp(fmt.Sprintf("%s LIKE %s ESCAPE '\\'", left.Identifier, right.Identifier), mergeParams(left.Params, wrapLikeParams(right.Params)))
+        }
+    case fexpr.SignNlike, fexpr.SignAnyNlike:
+        // the right side is a column and therefor wrap it with "%" for not-contains like behavior
+        if len(right.Params) == 0 {
+            expr = dbx.NewExp(fmt.Sprintf("%s NOT LIKE ('%%' || %s || '%%') ESCAPE '\\'", left.Identifier, right.Identifier), left.Params)
+        } else {
+            expr = dbx.NewExp(fmt.Sprintf("%s NOT LIKE %s ESCAPE '\\'", left.Identifier, right.Identifier), mergeParams(left.Params, wrapLikeParams(right.Params)))
+        }
+    case fexpr.SignLt, fexpr.SignAnyLt:
+        expr = dbx.NewExp(fmt.Sprintf("%s < %s", left.Identifier, right.Identifier), mergeParams(left.Params, right.Params))
+    case fexpr.SignLte, fexpr.SignAnyLte:
+        expr = dbx.NewExp(fmt.Sprintf("%s <= %s", left.Identifier, right.Identifier), mergeParams(left.Params, right.Params))
+    case fexpr.SignGt, fexpr.SignAnyGt:
+        expr = dbx.NewExp(fmt.Sprintf("%s > %s", left.Identifier, right.Identifier), mergeParams(left.Params, right.Params))
+    case fexpr.SignGte, fexpr.SignAnyGte:
+        expr = dbx.NewExp(fmt.Sprintf("%s >= %s", left.Identifier, right.Identifier), mergeParams(left.Params, right.Params))
+    default:
+        return nil, fmt.Errorf("unknown expression operator %q", op)
+    }
 
-	if expr == nil {
-		return nil, fmt.Errorf("unknown expression operator %q", op)
-	}
+    
 
 	// multi-match expressions
 	if !isAnyMatchOp(op) {
@@ -259,8 +259,8 @@ var normalizedIdentifiers = map[string]string{
 }
 
 func resolveToken(token fexpr.Token, fieldResolver FieldResolver) (*ResolverResult, error) {
-	switch token.Type {
-	case fexpr.TokenIdentifier:
+    switch token.Type {
+    case fexpr.TokenIdentifier:
 		// check for macros
 		// ---
 		if macroFunc, ok := identifierMacros[token.Literal]; ok {
@@ -304,19 +304,19 @@ func resolveToken(token fexpr.Token, fieldResolver FieldResolver) (*ResolverResu
 			Identifier: "{:" + placeholder + "}",
 			Params:     dbx.Params{placeholder: cast.ToFloat64(token.Literal)},
 		}, nil
-	case fexpr.TokenFunction:
-		fn, ok := TokenFunctions[token.Literal]
-		if !ok {
-			return nil, fmt.Errorf("unknown function %q", token.Literal)
-		}
+    case fexpr.TokenFunction:
+        fn, ok := TokenFunctions[token.Literal]
+        if !ok {
+            return nil, fmt.Errorf("unknown function %q", token.Literal)
+        }
 
-		args, _ := token.Meta.([]fexpr.Token)
-		return fn(func(argToken fexpr.Token) (*ResolverResult, error) {
-			return resolveToken(argToken, fieldResolver)
-		}, args...)
-	}
-
-	return nil, fmt.Errorf("unsupported token type %q", token.Type)
+        args, _ := token.Meta.([]fexpr.Token)
+        return fn(func(argToken fexpr.Token) (*ResolverResult, error) {
+            return resolveToken(argToken, fieldResolver)
+        }, args...)
+    default:
+        return nil, fmt.Errorf("unsupported token type %q", token.Type)
+    }
 }
 
 // Resolves = and != expressions in an attempt to minimize the COALESCE
@@ -410,40 +410,42 @@ func resolveEqualExpr(equal bool, left, right *ResolverResult) dbx.Expression {
 }
 
 func hasEmptyParamValue(result *ResolverResult) bool {
-	for _, p := range result.Params {
-		switch v := p.(type) {
-		case nil:
-			return true
-		case string:
-			if v == "" {
-				return true
-			}
-		}
-	}
+    for _, p := range result.Params {
+        switch v := p.(type) {
+        case nil:
+            return true
+        case string:
+            if v == "" {
+                return true
+            }
+        default:
+            // other param types are ignored for emptiness
+        }
+    }
 
 	return false
 }
 
 func isKnownNonEmptyIdentifier(result *ResolverResult) bool {
-	if result.NullFallback == NullFallbackEnforced {
-		return false
-	}
+    if result.NullFallback == NullFallbackEnforced {
+        return false
+    }
 
-	switch strings.ToLower(result.Identifier) {
-	case "1", "0", "false", `true`:
-		return true
-	}
-
-	return len(result.Params) > 0 && !hasEmptyParamValue(result) && !isEmptyIdentifier(result)
+    switch strings.ToLower(result.Identifier) {
+    case "1", "0", "false", `true`:
+        return true
+    default:
+        return len(result.Params) > 0 && !hasEmptyParamValue(result) && !isEmptyIdentifier(result)
+    }
 }
 
 func isEmptyIdentifier(result *ResolverResult) bool {
-	switch strings.ToLower(result.Identifier) {
-	case "", "null", "''", `""`, "``":
-		return true
-	default:
-		return false
-	}
+    switch strings.ToLower(result.Identifier) {
+    case "", "null", "''", `""`, "``":
+        return true
+    default:
+        return false
+    }
 }
 
 func isAnyMatchOp(op fexpr.SignOp) bool {
@@ -458,9 +460,9 @@ func isAnyMatchOp(op fexpr.SignOp) bool {
 		fexpr.SignAnyGt,
 		fexpr.SignAnyGte:
 		return true
+	default:
+		return false
 	}
-
-	return false
 }
 
 // mergeParams returns new dbx.Params where each provided params item
@@ -714,13 +716,4 @@ func (e *manyVsOneExpr) Build(db *dbx.DB, params dbx.Params) string {
 	}
 
 	if buildErr != nil {
-		return "0=1"
-	}
-
-	return fmt.Sprintf(
-		"NOT EXISTS (SELECT 1 FROM (%s) {{%s}} WHERE %s)",
-		e.subQuery.Build(db, params),
-		alias,
-		whereExpr.Build(db, params),
-	)
-}
+		r
