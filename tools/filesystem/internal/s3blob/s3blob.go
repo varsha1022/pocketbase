@@ -87,10 +87,12 @@ func (drv *driver) NormalizeError(err error) error {
 			return errors.Join(err, blob.ErrNotFound)
 		}
 
-		switch ae.Code {
-		case "NoSuchBucket", "NoSuchKey", "NotFound":
-			return errors.Join(err, blob.ErrNotFound)
-		}
+        switch ae.Code {
+        case "NoSuchBucket", "NoSuchKey", "NotFound":
+            return errors.Join(err, blob.ErrNotFound)
+        default:
+            return err
+        }
 	}
 
 	return err
