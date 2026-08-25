@@ -6,13 +6,12 @@
 //     get originalField: undefined
 // }
 export function settings(props) {
-    const uniqueId = "f_" + app.utils.randomString();
+    const app = globalThis.app || (typeof window !== "undefined" && window.app) || {};
+    const uniqueId = "f_" + (app.utils && typeof app.utils.randomString === "function" ? app.utils.randomString() : Math.random().toString(36).slice(2));
 
-    const local = store({
-        showInfo: false,
-    });
+    const local = typeof store === "function" ? store({ showInfo: false }) : { showInfo: false };
 
-    return app.components.fieldSettings(props, {
+    return (app.components && typeof app.components.fieldSettings === "function" ? app.components.fieldSettings : (p, o) => o)(props, {
         content: () =>
             t.div(
                 { className: "grid sm" },
