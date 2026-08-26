@@ -89,22 +89,24 @@ func (m *excerptModifier) Modify(value any) (any, error) {
 	// for all node types and more details check
 	// https://pkg.go.dev/golang.org/x/net/html#Parse
 	var stripTags func(*html.Node)
-	stripTags = func(n *html.Node) {
-		switch n.Type {
-		case html.TextNode:
-			// collapse multiple spaces into one
-			txt := whitespaceRegex.ReplaceAllString(n.Data, " ")
+    stripTags = func(n *html.Node) {
+        switch n.Type {
+        case html.TextNode:
+            // collapse multiple spaces into one
+            txt := whitespaceRegex.ReplaceAllString(n.Data, " ")
 
-			if hasPrevSpace {
-				txt = strings.TrimLeft(txt, " ")
-			}
+            if hasPrevSpace {
+                txt = strings.TrimLeft(txt, " ")
+            }
 
-			if txt != "" {
-				hasPrevSpace = strings.HasSuffix(txt, " ")
+            if txt != "" {
+                hasPrevSpace = strings.HasSuffix(txt, " ")
 
-				builder.WriteString(txt)
-			}
-		}
+                builder.WriteString(txt)
+            }
+        default:
+            // no-op for other node types
+        }
 
 		// excerpt max has been reached => no need to further iterate
 		// (+2 for the extra whitespace suffix/prefix that will be trimmed later)

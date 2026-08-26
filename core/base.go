@@ -1262,16 +1262,18 @@ func (app *BaseApp) initAuxDB() error {
 // @todo remove after refactoring the FilesManager interface
 func supportFiles(m Model) bool {
 	var collection *Collection
-	switch v := m.(type) {
-	case *Collection:
-		collection = v
-	case *Record:
-		collection = v.Collection()
-	case RecordProxy:
-		if v.ProxyRecord() != nil {
-			collection = v.ProxyRecord().Collection()
-		}
-	}
+    switch v := m.(type) {
+    case *Collection:
+        collection = v
+    case *Record:
+        collection = v.Collection()
+    case RecordProxy:
+        if v.ProxyRecord() != nil {
+            collection = v.ProxyRecord().Collection()
+        }
+    default:
+        collection = nil
+    }
 
 	if collection == nil {
 		return true

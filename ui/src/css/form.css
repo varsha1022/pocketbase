@@ -846,13 +846,11 @@ button {
         &:active::after {
             transform: scale(0.92);
         }
-        @supports (corner-shape: squircle) {
+        @supports (border-radius: 11px) {
             &::before {
-                corner-shape: squircle;
                 border-radius: 11px;
             }
             &::after {
-                corner-shape: squircle;
                 border-radius: 7px;
             }
         }

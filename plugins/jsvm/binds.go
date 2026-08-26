@@ -1051,24 +1051,24 @@ func BindHTTP(vm *goja.Runtime) {
 // checkGojaValueForError resolves the provided goja.Value and tries
 // to extract its underlying error value (if any).
 func checkGojaValueForError(app core.App, value goja.Value) error {
-	if value == nil {
-		return nil
-	}
+    if value == nil {
+        return nil
+    }
 
-	exported := value.Export()
-	switch v := exported.(type) {
-	case error:
-		return v
-	case *goja.Promise:
-		// Promise as return result is not officially supported but try to
-		// resolve any thrown exception to avoid silently ignoring it
-		app.Logger().Warn("the handler must a non-async function and not return a Promise")
-		if promiseErr, ok := v.Result().Export().(error); ok {
-			return normalizeException(promiseErr)
-		}
-	}
-
-	return nil
+    exported := value.Export()
+    switch v := exported.(type) {
+    case error:
+        return v
+    case *goja.Promise:
+        // Promise as return result is not officially supported but try to
+        // resolve any thrown exception to avoid silently ignoring it
+        app.Logger().Warn("the handler must a non-async function and not return a Promise")
+        if promiseErr, ok := v.Result().Export().(error); ok {
+            return normalizeException(promiseErr)
+        }
+    default:
+        return nil
+    }
 }
 
 // normalizeException checks if the provided error is a goja.Exception
@@ -1076,25 +1076,27 @@ func checkGojaValueForError(app core.App, value goja.Value) error {
 //
 // note: using just goja.Exception.Unwrap() is insufficient and may falsely result in nil.
 func normalizeException(err error) error {
-	if err == nil {
-		return nil
-	}
+    if err == nil {
+        return nil
+    }
 
-	jsException, ok := err.(*goja.Exception)
-	if !ok {
-		return err // no exception
-	}
+    jsException, ok := err.(*goja.Exception)
+    if !ok {
+        return err // no exception
+    }
 
-	switch v := jsException.Value().Export().(type) {
-	case error:
-		err = v
-	case map[string]any: // goja.GoError
-		if vErr, ok := v["value"].(error); ok {
-			err = vErr
-		}
-	}
+    switch v := jsException.Value().Export().(type) {
+    case error:
+        err = v
+    case map[string]any: // goja.GoError
+        if vErr, ok := v["value"].(error); ok {
+            err = vErr
+        }
+    default:
+        return err
+    }
 
-	return err
+    return err
 }
 
 var cachedFactoryFuncTypes = store.New[string, reflect.Type](nil)
@@ -1199,71 +1201,72 @@ var cachedDynamicModelStructs = store.New[string, reflect.Type](nil)
 //		"total": 0,
 //	})
 func newDynamicModel(shape map[string]any) any {
-	info := make([]*shapeFieldInfo, 0, len(shape))
+    info := make([]*shapeFieldInfo, 0, len(shape))
 
-	var hash strings.Builder
+    var hash strings.Builder
 
-	sortedKeys := make([]string, 0, len(shape))
-	for k := range shape {
-		sortedKeys = append(sortedKeys, k)
-	}
-	sort.Strings(sortedKeys)
+    sortedKeys := make([]string, 0, len(shape))
+    for k := range shape {
+        sortedKeys = append(sortedKeys, k)
+    }
+    sort.Strings(sortedKeys)
 
-	for _, k := range sortedKeys {
-		v := shape[k]
-		vt := reflect.TypeOf(v)
+    for _, k := range sortedKeys {
+        v := shape[k]
+        vt := reflect.TypeOf(v)
 
-		switch vt.Kind() {
-		case reflect.Map:
-			raw, _ := json.Marshal(v)
-			newV := types.JSONMap[any]{}
-			newV.Scan(raw)
-			v = newV
-			vt = reflect.TypeOf(v)
-		case reflect.Slice, reflect.Array:
-			raw, _ := json.Marshal(v)
-			newV := types.JSONArray[any]{}
-			newV.Scan(raw)
-			v = newV
-			vt = reflect.TypeOf(newV)
-		case reflect.Pointer:
-			// for pointers always fallback to nil as their default value
-			v = nil
-		}
+        switch vt.Kind() {
+        case reflect.Map:
+            raw, _ := json.Marshal(v)
+            newV := types.JSONMap[any]{}
+            newV.Scan(raw)
+            v = newV
+            vt = reflect.TypeOf(v)
+        case reflect.Slice, reflect.Array:
+            raw, _ := json.Marshal(v)
+            newV := types.JSONArray[any]{}
+            newV.Scan(raw)
+            v = newV
+            vt = reflect.TypeOf(newV)
+        case reflect.Pointer:
+            // for pointers always fallback to nil as their default value
+            v = nil
+        default:
+        }
 
-		hash.WriteString(k)
-		hash.WriteString(":")
-		hash.WriteString(vt.String()) // it doesn't guarantee to be unique across all types but it should be fine with the primitive types DynamicModel is used
-		hash.WriteString("|")
+        hash.WriteString(k)
+        hash.WriteString(":")
+        hash.WriteString(vt.String()) // it doesn't guarantee to be unique across all types but it should be fine with the primitive types DynamicModel is used
+        hash.WriteString("|")
 
-		info = append(info, &shapeFieldInfo{key: k, value: v, valueType: vt})
-	}
+        info = append(info, &shapeFieldInfo{key: k, value: v, valueType: vt})
+    }
 
-	st := cachedDynamicModelStructs.GetOrSet(hash.String(), func() reflect.Type {
-		structFields := make([]reflect.StructField, len(info))
+    st := cachedDynamicModelStructs.GetOrSet(hash.String(), func() reflect.Type {
+        structFields := make([]reflect.StructField, len(info))
 
-		for i, item := range info {
-			structFields[i] = reflect.StructField{
-				Name: inflector.UcFirst(item.key), // ensures that the field is exportable
-				Type: item.valueType,
-				Tag:  reflect.StructTag(`db:"` + item.key + `" json:"` + item.key + `" form:"` + item.key + `"`),
-			}
-		}
+        for i, item := range info {
+            structFields[i] = reflect.StructField{
+                Name: inflector.UcFirst(item.key), // ensures that the field is exportable
+                Type: item.valueType,
+                Tag:  reflect.StructTag(`db:"` + item.key + `" json:"` + item.key + `" form:"` + item.key + `"`),
+            }
+        }
 
-		return reflect.StructOf(structFields)
-	})
+        return reflect.StructOf(structFields)
+    })
 
-	elem := reflect.New(st).Elem()
+    elem := reflect.New(st).Elem()
 
-	// load default values into the new model
-	for i, item := range info {
-		if item.value == nil {
-			continue
-		}
-		elem.Field(i).Set(reflect.ValueOf(item.value))
-	}
+    // load default values into the new model
+    for i, item := range info {
+        if item.value == nil {
+            continue
+        }
+        elem.Field(i).Set(reflect.ValueOf(item.value))
+    }
 
-	return elem.Addr().Interface()
+    return elem.Addr().Interface()
 }
 
 type shapeFieldInfo struct {

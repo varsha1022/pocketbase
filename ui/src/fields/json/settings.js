@@ -6,6 +6,12 @@
 //     get originalField: undefined
 // }
 export function settings(props) {
+    const app = (typeof window !== "undefined" && window.app) || (typeof globalThis !== "undefined" && globalThis.app) || {
+        utils: { randomString: () => Math.random().toString(36).slice(2, 10) },
+        components: { fieldSettings: (p, opts) => opts, slide: (v, c) => c },
+        attrs: { tooltip: () => "" },
+    };
+
     const uniqueId = "f_" + app.utils.randomString();
 
     const local = store({

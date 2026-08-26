@@ -107,18 +107,20 @@ func (r *runner) run() (*search.ResolverResult, error) {
 				return r.processRequestBodyRelationField(bodyField)
 			}
 
-			if totalProps == 3 { // aka. last prop
-				switch modifier {
-				case eachModifier:
-					return r.processRequestBodyEachModifier(bodyField)
-				case lengthModifier:
-					return r.processRequestBodyLengthModifier(bodyField)
-				case lowerModifier:
-					return r.processRequestBodyLowerModifier(bodyField)
-				case changedModifier:
-					return r.processRequestBodyChangedModifier(bodyField)
-				}
-			}
+            if totalProps == 3 { // aka. last prop
+                switch modifier {
+                case eachModifier:
+                    return r.processRequestBodyEachModifier(bodyField)
+                case lengthModifier:
+                    return r.processRequestBodyLengthModifier(bodyField)
+                case lowerModifier:
+                    return r.processRequestBodyLowerModifier(bodyField)
+                case changedModifier:
+                    return r.processRequestBodyChangedModifier(bodyField)
+                default:
+                    return r.resolver.resolveStaticRequestField(r.activeProps[1:]...)
+                }
+            }
 		}
 
 		// some other @request.* static field

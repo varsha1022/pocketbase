@@ -11,6 +11,8 @@ window.app.fieldTypes.bool = {
     input,
     view,
     dummyData: (f, forSubmit = false) => {
-        return [true, false][Math.floor(Math.random() * 2)];
+        return (typeof crypto !== "undefined" && typeof crypto.getRandomValues === "function")
+            ? (crypto.getRandomValues(new Uint8Array(1))[0] & 1) === 1
+            : Math.random() < 0.5;
     },
 };

@@ -1029,22 +1029,22 @@ func (m *Record) UnmarshalJSONField(key string, result any) error {
 //
 // Returns nil if there is no such expand relation loaded.
 func (m *Record) ExpandedOne(relField string) *Record {
-	if m.expand == nil {
-		return nil
-	}
+    if m.expand == nil {
+        return nil
+    }
 
-	rel := m.expand.Get(relField)
+    rel := m.expand.Get(relField)
 
-	switch v := rel.(type) {
-	case *Record:
-		return v
-	case []*Record:
-		if len(v) > 0 {
-			return v[0]
-		}
-	}
-
-	return nil
+    switch v := rel.(type) {
+    case *Record:
+        return v
+    case []*Record:
+        if len(v) > 0 {
+            return v[0]
+        }
+    default:
+        return nil
+    }
 }
 
 // ExpandedAll retrieves a slice of relation Records from the already
@@ -1055,20 +1055,20 @@ func (m *Record) ExpandedOne(relField string) *Record {
 //
 // Returns nil slice if there is no such expand relation loaded.
 func (m *Record) ExpandedAll(relField string) []*Record {
-	if m.expand == nil {
-		return nil
-	}
+    if m.expand == nil {
+        return nil
+    }
 
-	rel := m.expand.Get(relField)
+    rel := m.expand.Get(relField)
 
-	switch v := rel.(type) {
-	case *Record:
-		return []*Record{v}
-	case []*Record:
-		return v
-	}
-
-	return nil
+    switch v := rel.(type) {
+    case *Record:
+        return []*Record{v}
+    case []*Record:
+        return v
+    default:
+        return nil
+    }
 }
 
 // FindFileFieldByFile returns the first file type field for which

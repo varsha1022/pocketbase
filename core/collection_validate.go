@@ -374,52 +374,52 @@ func (cv *collectionValidator) checkMinFields(value any) error {
 		return validation.NewError("validation_missing_primary_key", `Missing or invalid "id" PK field.`)
 	}
 
-	switch cv.new.Type {
-	case CollectionTypeAuth:
-		passwordField, _ := fields.GetByName(FieldNamePassword).(*PasswordField)
-		if passwordField == nil {
-			return validation.NewError("validation_missing_password_field", `System "password" field is required.`)
-		}
-		if !passwordField.Hidden || !passwordField.System {
-			return validation.Errors{FieldNamePassword: ErrMustBeSystemAndHidden}
-		}
+    switch cv.new.Type {
+    case CollectionTypeAuth:
+        passwordField, _ := fields.GetByName(FieldNamePassword).(*PasswordField)
+        if passwordField == nil {
+            return validation.NewError("validation_missing_password_field", `System "password" field is required.`)
+        }
+        if !passwordField.Hidden || !passwordField.System {
+            return validation.Errors{FieldNamePassword: ErrMustBeSystemAndHidden}
+        }
 
-		tokenKeyField, _ := fields.GetByName(FieldNameTokenKey).(*TextField)
-		if tokenKeyField == nil {
-			return validation.NewError("validation_missing_tokenKey_field", `System "tokenKey" field is required.`)
-		}
-		if !tokenKeyField.Hidden || !tokenKeyField.System {
-			return validation.Errors{FieldNameTokenKey: ErrMustBeSystemAndHidden}
-		}
+        tokenKeyField, _ := fields.GetByName(FieldNameTokenKey).(*TextField)
+        if tokenKeyField == nil {
+            return validation.NewError("validation_missing_tokenKey_field", `System "tokenKey" field is required.`)
+        }
+        if !tokenKeyField.Hidden || !tokenKeyField.System {
+            return validation.Errors{FieldNameTokenKey: ErrMustBeSystemAndHidden}
+        }
 
-		emailField, _ := fields.GetByName(FieldNameEmail).(*EmailField)
-		if emailField == nil {
-			return validation.NewError("validation_missing_email_field", `System "email" field is required.`)
-		}
-		if !emailField.System {
-			return validation.Errors{FieldNameEmail: ErrMustBeSystem}
-		}
+        emailField, _ := fields.GetByName(FieldNameEmail).(*EmailField)
+        if emailField == nil {
+            return validation.NewError("validation_missing_email_field", `System "email" field is required.`)
+        }
+        if !emailField.System {
+            return validation.Errors{FieldNameEmail: ErrMustBeSystem}
+        }
 
-		emailVisibilityField, _ := fields.GetByName(FieldNameEmailVisibility).(*BoolField)
-		if emailVisibilityField == nil {
-			return validation.NewError("validation_missing_emailVisibility_field", `System "emailVisibility" field is required.`)
-		}
-		if !emailVisibilityField.System {
-			return validation.Errors{FieldNameEmailVisibility: ErrMustBeSystem}
-		}
+        emailVisibilityField, _ := fields.GetByName(FieldNameEmailVisibility).(*BoolField)
+        if emailVisibilityField == nil {
+            return validation.NewError("validation_missing_emailVisibility_field", `System "emailVisibility" field is required.`)
+        }
+        if !emailVisibilityField.System {
+            return validation.Errors{FieldNameEmailVisibility: ErrMustBeSystem}
+        }
 
-		verifiedField, _ := fields.GetByName(FieldNameVerified).(*BoolField)
-		if verifiedField == nil {
-			return validation.NewError("validation_missing_verified_field", `System "verified" field is required.`)
-		}
-		if !verifiedField.System {
-			return validation.Errors{FieldNameVerified: ErrMustBeSystem}
-		}
+        verifiedField, _ := fields.GetByName(FieldNameVerified).(*BoolField)
+        if verifiedField == nil {
+            return validation.NewError("validation_missing_verified_field", `System "verified" field is required.`)
+        }
+        if !verifiedField.System {
+            return validation.Errors{FieldNameVerified: ErrMustBeSystem}
+        }
 
-		return nil
-	}
-
-	return nil
+        return nil
+    default:
+        return nil
+    }
 }
 
 func (validator *collectionValidator) ensureNoSystemFieldsChange(value any) error {
@@ -687,12 +687,12 @@ func (cv *collectionValidator) checkIndexes(value any) error {
 }
 
 func (validator *collectionValidator) validateOptions() error {
-	switch validator.new.Type {
-	case CollectionTypeAuth:
-		return validator.new.collectionAuthOptions.validate(validator)
-	case CollectionTypeView:
-		return validator.new.collectionViewOptions.validate(validator)
-	}
-
-	return nil
+    switch validator.new.Type {
+    case CollectionTypeAuth:
+        return validator.new.collectionAuthOptions.validate(validator)
+    case CollectionTypeView:
+        return validator.new.collectionViewOptions.validate(validator)
+    default:
+        return nil
+    }
 }

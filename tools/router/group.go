@@ -89,14 +89,16 @@ func (group *RouterGroup[T]) Unbind(middlewareIds ...string) *RouterGroup[T] {
 		}
 
 		// remove from the group children
-		for i := len(group.children) - 1; i >= 0; i-- {
-			switch v := group.children[i].(type) {
-			case *RouterGroup[T]:
-				v.Unbind(middlewareId)
-			case *Route[T]:
-				v.Unbind(middlewareId)
-			}
-		}
+        for i := len(group.children) - 1; i >= 0; i-- {
+            switch v := group.children[i].(type) {
+            case *RouterGroup[T]:
+                v.Unbind(middlewareId)
+            case *Route[T]:
+                v.Unbind(middlewareId)
+            default:
+                continue
+            }
+        }
 
 		// add to the exclude list
 		if group.excludedMiddlewares == nil {
@@ -190,37 +192,39 @@ func (group *RouterGroup[T]) HasRoute(method string, path string) bool {
 }
 
 func (group *RouterGroup[T]) hasRoute(pattern string, parents []*RouterGroup[T]) bool {
-	for _, child := range group.children {
-		switch v := child.(type) {
-		case *RouterGroup[T]:
-			if v.hasRoute(pattern, append(parents, group)) {
-				return true
-			}
-		case *Route[T]:
-			var result string
+        for _, child := range group.children {
+        switch v := child.(type) {
+        case *RouterGroup[T]:
+            if v.hasRoute(pattern, append(parents, group)) {
+                return true
+            }
+        case *Route[T]:
+            var result string
 
-			if v.Method != "" {
-				result += v.Method + " "
-			}
+            if v.Method != "" {
+                result += v.Method + " "
+            }
 
-			// add parent groups prefixes
-			for _, p := range parents {
-				result += p.Prefix
-			}
+            // add parent groups prefixes
+            for _, p := range parents {
+                result += p.Prefix
+            }
 
-			// add current group prefix
-			result += group.Prefix
+            // add current group prefix
+            result += group.Prefix
 
-			// add current route path
-			result += v.Path
+            // add current route path
+            result += v.Path
 
-			if result == pattern || // direct match
-				// compares without the named wildcard, aka. /abc/{test...} is equal to /abc/
-				stripWildcard(result) == stripWildcard(pattern) {
-				return true
-			}
-		}
-	}
+            if result == pattern || // direct match
+                // compares without the named wildcard, aka. /abc/{test...} is equal to /abc/
+                stripWildcard(result) == stripWildcard(pattern) {
+                return true
+            }
+        default:
+            continue
+        }
+    }
 	return false
 }
 

@@ -345,33 +345,39 @@ func downloadFile(
 }
 
 func archiveSuffix(goos, goarch string) string {
-	switch goos {
-	case "linux":
-		switch goarch {
-		case "amd64":
-			return "_linux_amd64.zip"
-		case "arm64":
-			return "_linux_arm64.zip"
-		case "arm":
-			return "_linux_armv7.zip"
-		}
-	case "darwin":
-		switch goarch {
-		case "amd64":
-			return "_darwin_amd64.zip"
-		case "arm64":
-			return "_darwin_arm64.zip"
-		}
-	case "windows":
-		switch goarch {
-		case "amd64":
-			return "_windows_amd64.zip"
-		case "arm64":
-			return "_windows_arm64.zip"
-		}
-	}
-
-	return ""
+    switch goos {
+    case "linux":
+        switch goarch {
+        case "amd64":
+            return "_linux_amd64.zip"
+        case "arm64":
+            return "_linux_arm64.zip"
+        case "arm":
+            return "_linux_armv7.zip"
+        default:
+            return ""
+        }
+    case "darwin":
+        switch goarch {
+        case "amd64":
+            return "_darwin_amd64.zip"
+        case "arm64":
+            return "_darwin_arm64.zip"
+        default:
+            return ""
+        }
+    case "windows":
+        switch goarch {
+        case "amd64":
+            return "_windows_amd64.zip"
+        case "arm64":
+            return "_windows_arm64.zip"
+        default:
+            return ""
+        }
+    default:
+        return ""
+    }
 }
 
 func compareVersions(a, b string) int {

@@ -200,12 +200,14 @@ func (a *smtpLoginAuth) Start(server *smtp.ServerInfo) (string, []byte, error) {
 // It is part of the [smtp.Auth] interface.
 func (a *smtpLoginAuth) Next(fromServer []byte, more bool) ([]byte, error) {
 	if more {
-		switch strings.ToLower(string(fromServer)) {
-		case "username:":
-			return []byte(a.username), nil
-		case "password:":
-			return []byte(a.password), nil
-		}
+        switch strings.ToLower(strings.TrimSpace(string(fromServer))) {
+        case "username:":
+            return []byte(a.username), nil
+        case "password:":
+            return []byte(a.password), nil
+        default:
+            return nil, errors.New("unexpected server challenge")
+        }
 	}
 
 	return nil, nil

@@ -6,14 +6,14 @@
 //     get originalField: undefined
 // }
 export function settings(props) {
-    const uniqueId = "f_" + app.utils.randomString();
+    const app = props.app || (typeof window !== "undefined" ? window.app : (typeof globalThis !== "undefined" ? globalThis.app : { utils: { randomString: () => Math.random().toString(36).slice(2), toArray: (v, d) => (Array.isArray(v) ? v : v ? [v] : (d ? [] : [])), deleteByPath: () => {} }, attrs: { tooltip: () => "" }, store: { errors: {} }, components: { fieldSettings: () => {}, select: () => {} } })), uniqueId = "f_" + (app.utils && app.utils.randomString ? app.utils.randomString() : Math.random().toString(36).slice(2));
 
     const isMultipleOptions = [
         { label: "Single", value: false },
         { label: "Multiple", value: true },
     ];
 
-    const optionsDropdown = t.div(
+    const optionsDropdown = (typeof t !== "undefined" && t.div ? t : { div: (..._a) => ({ contains: () => false, hidePopover: () => {}, querySelector: () => null, showPopover: () => {} }) }).div(
         {
             popover: "manual",
             className: "dropdown field-select-choices-dropdown",
@@ -59,7 +59,7 @@ export function settings(props) {
 
     const watchers = [
         // cap maxSelect value
-        watch(() => {
+        (typeof watch === 'function' ? watch : ((fn) => { fn(); return { unwatch: () => {} }; }))(() => {
             if (props.field.values?.length && props.field.maxSelect > props.field.values.length) {
                 props.field.maxSelect = props.field.values.length;
             }

@@ -302,38 +302,40 @@ func migrateOldCollections(txApp core.App, oldSettings *oldSettingsModel) error 
 
 		// migrate fields
 		// ---
-		for i, field := range c.Schema {
-			switch cast.ToString(field["type"]) {
-			case "bool":
-				field = toBoolField(field)
-			case "number":
-				field = toNumberField(field)
-			case "text":
-				field = toTextField(field)
-			case "url":
-				field = toURLField(field)
-			case "email":
-				field = toEmailField(field)
-			case "editor":
-				field = toEditorField(field)
-			case "date":
-				field = toDateField(field)
-			case "select":
-				field = toSelectField(field)
-			case "json":
-				field = toJSONField(field)
-			case "relation":
-				field = toRelationField(field)
-			case "file":
-				field = toFileField(field)
-			}
-			c.Schema[i] = field
-		}
+        for i, field := range c.Schema {
+            switch cast.ToString(field["type"]) {
+            case "bool":
+                field = toBoolField(field)
+            case "number":
+                field = toNumberField(field)
+            case "text":
+                field = toTextField(field)
+            case "url":
+                field = toURLField(field)
+            case "email":
+                field = toEmailField(field)
+            case "editor":
+                field = toEditorField(field)
+            case "date":
+                field = toDateField(field)
+            case "select":
+                field = toSelectField(field)
+            case "json":
+                field = toJSONField(field)
+            case "relation":
+                field = toRelationField(field)
+            case "file":
+                field = toFileField(field)
+            default:
+                // unknown/unsupported field type - leave as-is
+            }
+            c.Schema[i] = field
+        }
 
 		// type specific changes
-		switch c.Type {
-		case "auth":
-			// token configs
+        switch c.Type {
+        case "auth":
+            // token configs
 			// ---
 			c.Options["authToken"] = map[string]any{
 				"secret":   zeroFallback(cast.ToString(getMapVal(oldSettings.Value, "recordAuthToken", "secret")), dummyAuthCollection.AuthToken.Secret),
@@ -593,9 +595,11 @@ func migrateOldCollections(txApp core.App, oldSettings *oldSettingsModel) error 
 				// ignore errors in case the columns don't exist
 				_, _ = txApp.DB().DropColumn(c.Name, drop).Execute()
 			}
-		case "view":
-			c.Options["viewQuery"] = cast.ToString(options["query"])
-		}
+        case "view":
+            c.Options["viewQuery"] = cast.ToString(options["query"])
+        default:
+            // other collection types - no special handling
+        }
 
 		// prepend the id field
 		idField := map[string]any{
