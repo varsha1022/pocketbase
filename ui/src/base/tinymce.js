@@ -20,6 +20,7 @@ window.app.components = window.app.components || {};
  * @return {Element}
  */
 window.app.components.tinymce = function(propsArg = {}) {
+    const app = window.app || {};
     const props = store({
         rid: undefined,
         id: undefined,

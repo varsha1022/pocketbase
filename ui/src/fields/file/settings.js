@@ -6,14 +6,14 @@
 //     get originalField: undefined
 // }
 export function settings(props) {
-    const uniqueId = "f_" + app.utils.randomString();
+    const uniqueId = "f_" + window.app.utils.randomString();
 
     const isMultipleOptions = [
         { label: "Single", value: false },
         { label: "Multiple", value: true },
     ];
 
-    return app.components.fieldSettings(props, {
+    return window.app.components.fieldSettings(props, {
         header: [
             t.div(
                 {
