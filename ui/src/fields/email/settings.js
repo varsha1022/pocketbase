@@ -6,6 +6,7 @@
 //     get originalField: undefined
 // }
 export function settings(props) {
+    const app = props.app;
     const uniqueId = "f_" + app.utils.randomString();
 
     return app.components.fieldSettings(props, {
